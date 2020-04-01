@@ -4,26 +4,43 @@ namespace DockerModules\SingleAddressPageCheckout\Block\Checkout;
 
 class LayoutProcessor
 {
-
     /**
      * @param \Magento\Checkout\Block\Checkout\LayoutProcessor $subject
      * @param array $jsLayout
      * @return array
      */
-
-    public function afterProcess(
+    public function aroundProcess(
         \Magento\Checkout\Block\Checkout\LayoutProcessor $subject,
+        \Closure $proceed,
         array $jsLayout
-    )
-    {
-        // get billing address form at billing step
-        $billingAddressForm = $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['afterMethods']['children']['billing-address-form'];
+    ) {
+        $initialPaymentList = [];
 
-        // move address form to shipping step
-        $jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']['billing-address-form'] = $billingAddressForm;
+        if(isset($jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']
+            ['payment']['children']['payments-list'])) {
+            $initialPaymentList = $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']
+            ['payment']['children']['payments-list'];
+        }
 
-        // remove form from billing step
-        unset($jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']['payment']['children']['afterMethods']['children']['billing-address-form']);
+        $jsLayout = $proceed($jsLayout);
+
+        if(isset($jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']
+            ['payment']['children']['payments-list'])) {
+
+            $paymentList = $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']
+            ['payment']['children']['payments-list'];
+
+            // move address form to shipping step
+            $paymentList['children'] = array_diff_key($paymentList['children'], $initialPaymentList['children']);
+            $paymentList['component'] = 'DockerModules_SingleAddressPageCheckout/js/custom-payment-list';
+
+            $jsLayout['components']['checkout']['children']['steps']['children']['shipping-step']['children']
+            ['shippingAddress']['children']['shipping-address-fieldset']['children']['payments-list-custom'] = $paymentList;
+
+            // remove form from billing step
+            $jsLayout['components']['checkout']['children']['steps']['children']['billing-step']['children']
+                ['payment']['children']['payments-list'] = $initialPaymentList;
+        }
 
         return $jsLayout;
     }
