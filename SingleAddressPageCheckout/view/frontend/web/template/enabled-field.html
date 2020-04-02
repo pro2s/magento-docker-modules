@@ -1,0 +1,9 @@
+<div class="field choice">
+    <input type="checkbox"
+           data-bind="checked: isEnabled(), click: enableField"/>
+    <label><span
+            data-bind="i18n: getEnabledTitle()"></span></label>
+</div>
+<div if="isEnabled()" class="field">
+    <!-- ko template: 'ui/form/field' --><!-- /ko -->
+</div>

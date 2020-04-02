@@ -24,6 +24,13 @@ define([
          */
         getPayableTo: function () {
             return window.checkoutConfig.payment.checkmo.payableTo;
-        }
+        },
+
+        /**
+         * @return {String}
+         */
+        getBillingAddressFormName: function () {
+            return 'billing-address-form-' + this.item.method;
+        },
     });
 });
