@@ -1,5 +1,6 @@
 define([
-    'Magento_Ui/js/form/element/abstract'
+    'Magento_Ui/js/form/element/abstract',
+    'Magento_Checkout/js/model/quote',
 ], function (Component) {
     'use strict';
 

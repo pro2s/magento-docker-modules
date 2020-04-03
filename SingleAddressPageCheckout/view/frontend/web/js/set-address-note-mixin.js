@@ -12,8 +12,11 @@ define([
                 shippingAddress['extension_attributes'] = {};
             }
 
-            shippingAddress['extension_attributes']['address_note'] = shippingAddress.customAttributes['address_note'];
-            // pass execution to original action ('Magento_Checkout/js/action/set-shipping-information')
+            if (shippingAddress.customAttributes !== undefined) {
+                shippingAddress['extension_attributes']['address_note'] = shippingAddress.customAttributes['address_note'] ?? null;
+                // pass execution to original action ('Magento_Checkout/js/action/set-shipping-information')
+            }
+
             return originalAction();
         });
     };
