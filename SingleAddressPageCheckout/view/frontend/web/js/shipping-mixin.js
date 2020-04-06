@@ -3,12 +3,16 @@ define([
     'Magento_Ui/js/model/messageList',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/checkout-data-resolver',
+    'Magento_Checkout/js/action/get-payment-information',
+    'DockerModules_SingleAddressPageCheckout/js/billing-address-quote',
 ],
 function (
     setBillingAddressAction,
     globalMessageList,
     quote,
     checkoutDataResolver,
+    getPaymentInformationAction,
+    billingAddressQuote,
 ) {
     'use strict';
 
@@ -20,7 +24,9 @@ function (
         initialize: function () {
             this._super();
 
+            quote.billingAddress(null);
             checkoutDataResolver.resolveBillingAddress();
+            getPaymentInformationAction();
 
             quote.paymentMethod.subscribe(function (paymentMethod) {
                 this.paymentMethodForBillingAddress = paymentMethod;
@@ -30,7 +36,7 @@ function (
         validateShippingInformation: function() {
             const valid = this._super();
 
-            if (valid && quote.shippingAddress().canUseForBilling()) {
+            if(billingAddressQuote.billingAddressSame()) {
                 return valid;
             }
 
